@@ -1,0 +1,14 @@
+Umsätze Kontokorrentkonto (00);;;Kundennummer: 111 2222222
+02.01.2019 - 31.01.2019
+Letzter Kontostand;;;;23.420,05;EUR
+Vorgemerkte und noch nicht gebuchte Umsätze sind nicht Bestandteil dieser Übersicht.
+Buchungstag;Wert;Umsatzart;Begünstigter / Auftraggeber;Verwendungszweck;IBAN;BIC;Kundenreferenz;Mandatsreferenz ;Gläubiger ID;Fremde Gebühren;Betrag;Abweichender Empfänger;Anzahl der Aufträge;Anzahl der Schecks;Soll;Haben;Währung
+02.01.2019;02.01.2019;"SEPA-Gutschrift von";Ben Utzer;RINP Dauerauftrag aaerla;DE22222222222222222222;CAGCCTAGCCG;;;;;;;;;;15,00;EUR
+02.01.2019;02.01.2019;"SEPA-Gutschrift von";Nord, Frank;Mitgliedsbeitrag;DE23232323232323232323;AACGTACTTAC;;;;;;;;;;11,23;EUR
+0.01.2019;03.01.2019;"SEPA-Gutschrift von";Gnargh Mrnom;RINP Dauerauftrag MITGLIEDSBEITRAG;DE23232323232323232323;CGCCCTAGTCA;ZV0000000000000000000002;;;;;;;;;15,00;EUR
+03.01.2019;03.01.2019;"SEPA-Gutschrift von";Ben Utzer;RINP Dauerauftrag MITGLIEDSBEITRAG;DE23232323232323232323;CGTAGTCGTAC;ZV0000000000000000000001;;;;;;;;;42,00;EUR
+07.01.2019;07.01.2019;"SEPA-Gutschrift von";Nachname, Vorname1, Nachname, Vorname2;RINP Dauerauftrag Mitgliedsbeitrag Vorname1Mitgliedsbeitrag Vorname2;DE23232323232323232323;CACCCGTCAGT;000000012345;;;;;;;;;42,23;EUR
+10.01.2019;10.01.2019;"SEPA-Dauerauftrag an";STROMAG;RINP Dauerauftrag Abschlagszahlung Vertragskonto 1000000;CH00000100000000000042;CGAATGAACCC;;;;;;;;;-1200,00;;EUR
+11.01.2019;11.01.2019;"SEPA-Überweisung an";FN Ord. X;2222222222222;DE00000000000000000001;CAGCATGAGTC;;;;;;;;;-651,26;;EUR
+22.01.2019;22.01.2019;;;SMS-Gebühren für Sicherheitssimulation und Benachrichtigu ungen - Oktober 2018;;;;;;;;;;;-1,99;;EUR
+Kontostand;31.01.2019;;;42.230,00;EUR
