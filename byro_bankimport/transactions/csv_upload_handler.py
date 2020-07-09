@@ -3,6 +3,7 @@ Handle csv upload parse signal
 """
 from django.db.transaction import atomic
 
+from byro.settings import config
 from byro.bookkeeping.models import (
     Transaction,
     Booking,
@@ -15,25 +16,41 @@ from byro_bankimport.transactions.parsers.deutsche_bank import (
 )
 
 
-# TODO: get from config
-CREDIT_ACCOUNT_NAME = "Member fees"
+CREDIT_ACCOUNT_NAME = config.get("bankimport", "credit_account_name")
 CREDIT_ACCOUNT = Account.objects.get(name=CREDIT_ACCOUNT_NAME)
+
+
 
 def process_csv_upload(tx_source):
     """Process incoming Transaction file"""
     print("processing source file:", tx_source.source_file)
-    with open(tx_source.source_file.url, encoding="iso-8859-1") as f:
-        transactions = deutsche_bank.parse_file(f) 
+    filepath = tx_source.source_file.path
+    with open(filepath, encoding="iso-8859-1") as f:
+        transactions = deutsche_bank.parse_file(f)
+        file_id = deutsche_bank.file_id(f)
 
         # Create byro transactions and bookings
-        for tx in transactions:
+        for nr, tx in enumerate(transactions):
             if tx["type"] != TX_TYPE_CREDIT:
                 continue # We are not interested.
+
             with atomic():
+                # Check if transaction is already present!
+                if Transaction.objects.filter(
+                        data__fileid=file_id,
+                        data__nr=nr,
+                    ).exists():
+                    print(" - skipping transaction nr: {}".format(nr))
+                    continue
+
                 transaction = Transaction(
                     memo=tx["name"],
                     booking_datetime=tx["booking_datetime"],
                     value_datetime=tx["value_datetime"],
+                    data={
+                        "file_id": file_id,
+                        "nr": nr,
+                    },
                 )
                 transaction.save()
 
@@ -43,7 +60,7 @@ def process_csv_upload(tx_source):
                     source=tx_source,
                     booking_datetime=tx["booking_datetime"],
                     amount=tx["amount"],
-                    memo=tx["memo"], 
+                    memo=tx["memo"],
                     importer="byro_bankimport",
                 )
                 booking.save()

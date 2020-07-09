@@ -4,7 +4,7 @@ from django.dispatch import receiver
 
 from byro.bookkeeping.signals import process_csv_upload
 
-from byro_bankimport.transactions import csv_upload_handler 
+from byro_bankimport.transactions import csv_upload_handler
 
 
 # Connect Signals
