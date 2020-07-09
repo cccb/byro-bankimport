@@ -3,7 +3,7 @@ Parse CSV export from Deutsche Bank.
 """
 
 import csv
-from typing import List, Tuple, Any, IO
+from typing import List, Tuple, Any, TextIO
 from datetime import datetime
 from decimal import Decimal
 from hashlib import md5
@@ -21,18 +21,18 @@ TX_TYPE_CREDIT = "credit"
 TX_TYPE_DEBIT = "debit"
 
 
-def file_id(csv_file: IO) -> str:
+def file_id(csv_file: TextIO) -> str:
     """Calcuate a file id"""
     md5sum = md5()
 
     csv_file.seek(0)
     data = csv_file.read()
-    md5sum.update(bytes(data, "utf-8"))
+    md5sum.update(bytes(data, csv_file.encoding))
 
     return md5sum.hexdigest()
 
 
-def parse_file(csv_file: IO) -> List[dict]:
+def parse_file(csv_file: TextIO) -> List[dict]:
     """Parse the accout export file"""
     csv_file.seek(0)
     reader = csv.reader(

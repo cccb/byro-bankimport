@@ -34,33 +34,38 @@ def process_csv_upload(tx_source):
             if tx["type"] != TX_TYPE_CREDIT:
                 continue # We are not interested.
 
-            with atomic():
-                # Check if transaction is already present!
-                if Transaction.objects.filter(
-                        data__fileid=file_id,
-                        data__nr=nr,
-                    ).exists():
-                    print(" - skipping transaction nr: {}".format(nr))
-                    continue
+            _import_transaction(tx_source, file_id, nr, tx)
 
-                transaction = Transaction(
-                    memo=tx["name"],
-                    booking_datetime=tx["booking_datetime"],
-                    value_datetime=tx["value_datetime"],
-                    data={
-                        "file_id": file_id,
-                        "nr": nr,
-                    },
-                )
-                transaction.save()
 
-                booking = Booking(
-                    transaction=transaction,
-                    debit_account=CREDIT_ACCOUNT,
-                    source=tx_source,
-                    booking_datetime=tx["booking_datetime"],
-                    amount=tx["amount"],
-                    memo=tx["memo"],
-                    importer="byro_bankimport",
-                )
-                booking.save()
+@atomic
+def _import_transaction(tx_source, file_id, nr, tx):
+    """Import the transaction"""
+    # Check if transaction is already present!
+    if Transaction.objects.filter(
+            data__file_id=file_id,
+            data__nr=nr,
+        ).exists():
+        print(" - skipping transaction nr: {}".format(nr))
+        return
+
+    transaction = Transaction(
+        memo=tx["name"],
+        booking_datetime=tx["booking_datetime"],
+        value_datetime=tx["value_datetime"],
+        data={
+            "file_id": file_id,
+            "nr": nr,
+        },
+    )
+    transaction.save()
+
+    booking = Booking(
+        transaction=transaction,
+        debit_account=CREDIT_ACCOUNT,
+        source=tx_source,
+        booking_datetime=tx["booking_datetime"],
+        amount=tx["amount"],
+        memo=tx["memo"],
+        importer="byro_bankimport",
+    )
+    booking.save()
