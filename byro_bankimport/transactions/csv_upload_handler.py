@@ -1,6 +1,8 @@
 """
 Handle csv upload parse signal
 """
+from hashlib import sha256
+
 from django.db.transaction import atomic
 
 from byro.settings import config
@@ -49,12 +51,15 @@ def _import_transaction(tx_source, file_id, nr, tx):
         return
 
     transaction = Transaction(
-        memo=tx["name"],
+        memo="Received from: {}".format(tx["name"]),
         booking_datetime=tx["booking_datetime"],
         value_datetime=tx["value_datetime"],
         data={
+            "correlation_id": correlation_id(tx),
             "file_id": file_id,
             "nr": nr,
+            "name": tx["name"],
+            "memo": tx["memo"],
         },
     )
     transaction.save()
@@ -65,7 +70,22 @@ def _import_transaction(tx_source, file_id, nr, tx):
         source=tx_source,
         booking_datetime=tx["booking_datetime"],
         amount=tx["amount"],
-        memo=tx["memo"],
+        memo="{}: {}".format(tx["name"], tx["memo"]),
         importer="byro_bankimport",
     )
     booking.save()
+
+
+def correlation_id(tx) -> str:
+    """
+    Calculate a hash over the bank account information
+    for later correlation with the member account.
+
+    The hash is calculated over the IBAN + BIC
+    """
+    shasum = sha256()
+    shasum.update(bytes(tx["iban"], "utf-8"))
+    shasum.update(bytes(tx["bic"], "utf-8"))
+
+    return shasum.hexdigest()
+
