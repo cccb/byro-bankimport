@@ -17,14 +17,19 @@ from byro_bankimport.transactions.parsers.deutsche_bank import (
     TX_TYPE_CREDIT,
 )
 
-
-CREDIT_ACCOUNT_NAME = config.get("bankimport", "credit_account_name")
-CREDIT_ACCOUNT = Account.objects.get(name=CREDIT_ACCOUNT_NAME)
-
+try:
+    CREDIT_ACCOUNT_ID = config.get("bankimport", "credit_account_id")
+    CREDIT_ACCOUNT = Account.objects.get(pk=CREDIT_ACCOUNT_ID)
+except:
+    CREDIT_ACCOUNT = None
+    print("WARNING: Bank account not configured.")
 
 
 def process_csv_upload(tx_source):
     """Process incoming Transaction file"""
+    if not CREDIT_ACCOUNT:
+        raise RuntimeError("Import Not Configured.")
+
     print("processing source file:", tx_source.source_file)
     filepath = tx_source.source_file.path
     with open(filepath, encoding="iso-8859-1") as f:
@@ -51,7 +56,10 @@ def _import_transaction(tx_source, file_id, nr, tx):
         return
 
     transaction = Transaction(
-        memo="Received from: {}".format(tx["name"]),
+        memo="Received from: {} | {} | {}".format(
+            tx["name"],
+            tx["iban"],
+            tx["memo"]),
         booking_datetime=tx["booking_datetime"],
         value_datetime=tx["value_datetime"],
         data={
@@ -60,6 +68,8 @@ def _import_transaction(tx_source, file_id, nr, tx):
             "nr": nr,
             "name": tx["name"],
             "memo": tx["memo"],
+            "iban": tx["iban"],
+            "bic": tx["bic"],
         },
     )
     transaction.save()
